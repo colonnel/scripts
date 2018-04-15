@@ -1,0 +1,10 @@
+#!/bin/bash
+BUILD=$1
+cd docker && docker build -t tomcat_mzol_$BUILD . &&
+docker tag tomcat_mzol_$BUILD 172.16.0.7:5000/tomcat_mzol_$BUILD &&
+# push images to local registry
+docker push 172.16.0.7:5000/tomcat_mzol_$BUILD &&
+docker tag tomcat_mzol_$BUILD tomcat_mzol &&
+docker rmi tomcat_mzol_$BUILD 172.16.0.7:5000/tomcat_mzol_$BUILD
+# delete ALL dangling data
+docker system prune -f
