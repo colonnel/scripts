@@ -1,0 +1,23 @@
+*nat
+
+# Проброс ssh и www в виртуалку lh-01
+#-A PREROUTING -d 192.168.56.100/32 -p tcp -m tcp --dport 8822 -j DNAT --to-destination 172.16.0.100:22
+#-A POSTROUTING -d 172.16.0.100/32 -p tcp -m tcp --dport 22 -j SNAT --to-source 192.168.56.100
+
+#-A PREROUTING -d 192.168.56.100/32 -p tcp -m tcp --dport 80 -j DNAT --to-destination 172.16.0.100:80
+#-A POSTROUTING -d 172.16.0.100/32 -p tcp -m tcp --dport 80 -j SNAT --to-source 192.168.56.100
+
+# NAT
+-A POSTROUTING -s 172.16.0.0/24 -o enp0s9 -j MASQUERADE
+
+COMMIT
+
+# Filter
+*filter
+
+# Virtual machines
+# Accept DNS (port 53) and DHCP (port 67) packets from VMs.
+-A INPUT -i enp0s9 -p udp -m udp -m multiport --dports 53,67 -j ACCEPT
+-A INPUT -i enp0s9 -p tcp -m tcp -m multiport --dports 53,67 -j ACCEPT
+
+COMMIT
